@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="magedia_customer_group_discount.customer_group_discount_service"
+                 class="MagediaCustomerGroupDiscount\Service\CustomerGroupDiscount">
+            <argument>%magedia_customer_group_discount.plugin_name%</argument>
+            <argument type="service" id="shopware.plugin.cached_config_reader"/>
+            <argument type="service" id="shopware_storefront.context_service"/>
+            <argument type="service" id="db"/>
+            <argument type="service" id="session"/>
+            <argument type="service" id="snippets"/>
+            <argument type="service" id="template"/>
+        </service>
+
+        <service id="magedia_customer_group_discount.subscriber.dispatch" class="MagediaCustomerGroupDiscount\Subscriber\Frontend">
+            <argument>%magedia_customer_group_discount.plugin_dir%</argument>
+            <argument type="service" id="shopware.plugin.cached_config_reader"/>
+            <argument type="service" id="magedia_customer_group_discount.customer_group_discount_service" />
+            <tag name="shopware.event_subscriber"/>
+        </service>
+
+        <service id="magedia_customer_group_discount.subscriber.controller" class="MagediaCustomerGroupDiscount\Subscriber\Controller">
+            <argument>%magedia_customer_group_discount.plugin_dir%</argument>
+            <argument type="service" id="template"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+    </services>
+</container>
