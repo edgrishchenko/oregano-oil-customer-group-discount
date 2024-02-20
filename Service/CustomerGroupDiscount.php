@@ -3,9 +3,11 @@
 namespace MagediaCustomerGroupDiscount\Service;
 
 use Shopware\Bundle\StoreFrontBundle\Service\ContextServiceInterface;
+use Shopware\Components\Model\ModelManager;
 use Shopware\Components\Plugin\ConfigReader;
+use Shopware\Models\Customer\Customer;
 
-class CustomerGroupDiscount implements CustomerGroupDiscountInterface
+class CustomerGroupDiscount
 {
     private $sBasketAmount;
 
@@ -49,6 +51,11 @@ class CustomerGroupDiscount implements CustomerGroupDiscountInterface
     private $template;
 
     /**
+     * @var ModelManager
+     */
+    private $modelManager;
+
+    /**
      * @param string $pluginName
      * @param ConfigReader $config
      * @param ContextServiceInterface $contextInterface
@@ -64,7 +71,8 @@ class CustomerGroupDiscount implements CustomerGroupDiscountInterface
         \Enlight_Components_Db_Adapter_Pdo_Mysql $db,
         \Enlight_Components_Session_Namespace $session,
         \Shopware_Components_Snippet_Manager $snippets,
-        \Enlight_Template_Manager $template
+        \Enlight_Template_Manager $template,
+        ModelManager $modelManager
     ) {
         $this->pluginName = $pluginName;
         $this->config = $config;
@@ -73,6 +81,7 @@ class CustomerGroupDiscount implements CustomerGroupDiscountInterface
         $this->session = $session;
         $this->snippets = $snippets;
         $this->template = $template;
+        $this->modelManager = $modelManager;
     }
 
     public function getCustomerGroupDiscountData()
@@ -91,8 +100,8 @@ class CustomerGroupDiscount implements CustomerGroupDiscountInterface
     {
         $this->discountLimitDifference = $this->discountLimitDifference ?: $this->calculateDiscountLimitDifference();
 
-        if (!in_array($this->contextInterface->getShopContext()->getCurrentCustomerGroup()->getId(),
-            $this->config->getByPluginName($this->pluginName)['selectedCustomerGroups']) || $this->discountLimitDifference === false) {
+        if ($this->contextInterface->getShopContext()->getCurrentCustomerGroup()->getId() !==
+            $this->config->getByPluginName($this->pluginName)['magediaSelectedCustomerGroup'] || $this->discountLimitDifference === false) {
             return false;
         }
 
@@ -113,7 +122,6 @@ class CustomerGroupDiscount implements CustomerGroupDiscountInterface
 
         return $this->template->fetch('string:'. $snippet);
     }
-
 
     /**
      * Function to calculate the DiscountLimitDifference
@@ -224,5 +232,40 @@ class CustomerGroupDiscount implements CustomerGroupDiscountInterface
         );
 
         return $discounts;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPlatinumCustomer()
+    {
+        if ($this->contextInterface->getShopContext()->getCurrentCustomerGroup()->getId() !==
+            $this->config->getByPluginName($this->pluginName)['magediaSelectedCustomerGroup']) {
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    public function renderCustomerSalutationSnippet()
+    {
+        $snippetNamespace = $this->snippets->getNamespace('frontend/customer_group_discount');
+
+        $userId = $this->session->get('sUserId');
+        $customer = $this->modelManager->find(Customer::class, $userId);
+
+        $snippet = $customer->getSalutation() == 'mr'
+            ? $snippetNamespace->get('customer_group_discount_salutation_mr')
+            : $snippetNamespace->get('customer_group_discount_salutation_ms');
+
+        $snippet = str_replace('%FIRSTNAME%', $customer->getFirstname(), $snippet);
+        $snippet = str_replace('%LASTNAME%', $customer->getLastname(), $snippet);
+
+        return $this->template->fetch('string:'. $snippet);
     }
 }

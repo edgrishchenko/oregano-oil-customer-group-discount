@@ -3,14 +3,12 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware5/shopware/5.3/engine/Shopware/Components/Plugin/schema/config.xsd">
     <elements>
         <element type="combo">
-            <name>selectedCustomerGroups</name>
-            <label>Select Customer groups</label>
-            <description lang="de">Select customer groups to display discount info for them</description>
-            <description lang="en">Select customer groups to display discount info for them</description>
+            <name>magediaSelectedCustomerGroup</name>
+            <label lang="de">Wählen Sie Kundengruppe aus</label>
+            <label>Select customer group</label>
+            <description lang="de">Wählen Sie eine Kundengruppe aus, um Rabattinformationen für sie anzuzeigen</description>
+            <description lang="en">Select customer group to display discount info for them</description>
             <store>Shopware.apps.Base.store.CustomerGroup</store>
-            <options>
-                <multiSelect>true</multiSelect>
-            </options>
         </element>
     </elements>
 </config>

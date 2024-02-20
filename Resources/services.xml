@@ -12,16 +12,25 @@
             <argument type="service" id="session"/>
             <argument type="service" id="snippets"/>
             <argument type="service" id="template"/>
+            <argument type="service" id="models"/>
         </service>
 
-        <service id="magedia_customer_group_discount.subscriber.dispatch" class="MagediaCustomerGroupDiscount\Subscriber\Frontend">
+        <service id="magedia_customer_group_discount.subscriber.template_registration"
+                 class="MagediaCustomerGroupDiscount\Subscriber\TemplateRegistration">
             <argument>%magedia_customer_group_discount.plugin_dir%</argument>
-            <argument type="service" id="shopware.plugin.cached_config_reader"/>
-            <argument type="service" id="magedia_customer_group_discount.customer_group_discount_service" />
+            <argument type="service" id="template"/>
             <tag name="shopware.event_subscriber"/>
         </service>
 
-        <service id="magedia_customer_group_discount.subscriber.controller" class="MagediaCustomerGroupDiscount\Subscriber\Controller">
+        <service id="magedia_customer_group_discount.subscriber.dispatch"
+                 class="MagediaCustomerGroupDiscount\Subscriber\Frontend">
+            <argument>%magedia_customer_group_discount.plugin_dir%</argument>
+            <argument type="service" id="magedia_customer_group_discount.customer_group_discount_service"/>
+            <tag name="shopware.event_subscriber"/>
+        </service>
+
+        <service id="magedia_customer_group_discount.subscriber.controller"
+                 class="MagediaCustomerGroupDiscount\Subscriber\Controller">
             <argument>%magedia_customer_group_discount.plugin_dir%</argument>
             <argument type="service" id="template"/>
             <tag name="shopware.event_subscriber"/>

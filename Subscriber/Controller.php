@@ -14,20 +14,20 @@ class Controller implements SubscriberInterface
     /**
      * @var \Enlight_Template_Manager
      */
-    private $view;
+    private $templateManager;
 
     /**
      * Controller constructor.
      *
      * @param string $pluginDirectory
-     * @param \Enlight_Template_Manager $view
+     * @param \Enlight_Template_Manager $templateManager
      */
     public function __construct(
         string $pluginDirectory,
-        \Enlight_Template_Manager $view
+        \Enlight_Template_Manager $templateManager
     ) {
         $this->pluginDirectory = $pluginDirectory;
-        $this->view = $view;
+        $this->templateManager = $templateManager;
     }
 
     /**
@@ -45,14 +45,14 @@ class Controller implements SubscriberInterface
 
     public function onGetControllerPathFrontend(\Enlight_Event_EventArgs $args)
     {
-        $this->view->addTemplateDir($this->pluginDirectory . '/Resources/views');
+        $this->templateManager->addTemplateDir($this->pluginDirectory . '/Resources/views');
 
         return $this->pluginDirectory . '/Controllers/Frontend/MagediaCustomerGroupDiscount.php';
     }
 
     public function onGetControllerPathWidgets(\Enlight_Event_EventArgs $args)
     {
-        $this->view->addTemplateDir($this->pluginDirectory . '/Resources/views');
+        $this->templateManager->addTemplateDir($this->pluginDirectory . '/Resources/views');
 
         return $this->pluginDirectory . '/Controllers/Widgets/MagediaCustomerGroupDiscount.php';
     }

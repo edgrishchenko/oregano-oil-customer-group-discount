@@ -4,7 +4,6 @@ namespace MagediaCustomerGroupDiscount\Subscriber;
 
 use Enlight\Event\SubscriberInterface;
 use MagediaCustomerGroupDiscount\Service\CustomerGroupDiscount;
-use Shopware\Components\Plugin\ConfigReader;
 
 class Frontend implements SubscriberInterface
 {
@@ -12,11 +11,6 @@ class Frontend implements SubscriberInterface
      * @var string
      */
     private $pluginDirectory;
-
-    /**
-     * @var ConfigReader
-     */
-    protected $config;
 
     /**
      * @var CustomerGroupDiscount
@@ -27,18 +21,13 @@ class Frontend implements SubscriberInterface
      * Dispatch constructor.
      *
      * @param string $pluginDirectory
-     * @param ConfigReader $config
      * @param CustomerGroupDiscount $customerGroupDiscount
-     *
-     * @throws \Exception
      */
     public function __construct(
         string $pluginDirectory,
-        ConfigReader $config,
         CustomerGroupDiscount $customerGroupDiscount
     ) {
         $this->pluginDirectory = $pluginDirectory;
-        $this->config = $config;
         $this->customerGroupDiscount = $customerGroupDiscount;
     }
 
@@ -49,14 +38,14 @@ class Frontend implements SubscriberInterface
     {
         return [
             'Enlight_Controller_Action_PostDispatchSecure_Frontend' => 'onPostDispatchSecureFrontend',
-            'Shopware_Controllers_Frontend_Checkout::ajaxAddArticleCartAction::after' => 'afterAddingAcrticles'
+            'Shopware_Controllers_Frontend_Checkout::ajaxAddArticleCartAction::after' => 'afterAddingArticles'
         ];
     }
 
     /**
      * @param \Enlight_Hook_HookArgs $args
      */
-    public function afterAddingAcrticles(\Enlight_Hook_HookArgs $args)
+    public function afterAddingArticles(\Enlight_Hook_HookArgs $args)
     {
         /** @var \Shopware_Controllers_Frontend_Checkout $subject */
         $subject = $args->getSubject();
@@ -96,6 +85,11 @@ class Frontend implements SubscriberInterface
                 $view->assign('magediaCustomerGroupDiscountSnippet', $snippet);
                 $html = '<span class="magediaCustomerGroupDiscountDifference">' . $snippet . '</span>';
                 $view->assign('magediaCustomerGroupDiscount', $html);
+            }
+
+            if ($this->customerGroupDiscount->isPlatinumCustomer()) {
+                $view->assign('magediaIsPlatinumCustomer',true);
+                $view->assign('magediaCustomerSalutation', $this->customerGroupDiscount->renderCustomerSalutationSnippet());
             }
         }
     }
