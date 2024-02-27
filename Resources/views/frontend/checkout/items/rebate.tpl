@@ -6,6 +6,8 @@
             <div class="table--column column--message">
                 <div class="panel--td table--content">
                     {s name="platinumCustomerCartAdditionalMessage" namespace="frontend/customer_group_discount"}{/s}
+                    {s name="platinumCustomerDiscountMessage" namespace="frontend/customer_group_discount"}{/s}
+                    {$sBasketItem.price|ltrim:'-'|currency}
                 </div>
             </div>
         </div>

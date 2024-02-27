@@ -249,7 +249,7 @@ class CustomerGroupDiscount
     }
 
     /**
-     * @return string
+     * @return string|bool
      * @throws \Exception
      */
     public function renderCustomerSalutationSnippet()
@@ -257,15 +257,19 @@ class CustomerGroupDiscount
         $snippetNamespace = $this->snippets->getNamespace('frontend/customer_group_discount');
 
         $userId = $this->session->get('sUserId');
-        $customer = $this->modelManager->find(Customer::class, $userId);
 
-        $snippet = $customer->getSalutation() == 'mr'
-            ? $snippetNamespace->get('customer_group_discount_salutation_mr')
-            : $snippetNamespace->get('customer_group_discount_salutation_ms');
+        if ($userId) {
+            $customer = $this->modelManager->find(Customer::class, $userId);
 
-        $snippet = str_replace('%FIRSTNAME%', $customer->getFirstname(), $snippet);
-        $snippet = str_replace('%LASTNAME%', $customer->getLastname(), $snippet);
+            $snippet = $customer->getSalutation() == 'mr'
+                ? $snippetNamespace->get('customer_group_discount_salutation_mr')
+                : $snippetNamespace->get('customer_group_discount_salutation_ms');
 
-        return $this->template->fetch('string:'. $snippet);
+            $snippet = str_replace('%FIRSTNAME%', $customer->getFirstname(), $snippet);
+
+            return $this->template->fetch('string:'. $snippet);
+        }
+
+        return false;
     }
 }
